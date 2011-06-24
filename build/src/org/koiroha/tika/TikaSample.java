@@ -17,6 +17,7 @@ import java.text.NumberFormat;
 import java.util.prefs.*;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 
 import org.apache.tika.Tika;
 
@@ -61,7 +62,7 @@ public class TikaSample extends JFrame {
 	/**
 	 * Tika で取得したテキストの内容を表示する領域です。
 	 */
-	private final JTextPane plain = new JTextPane();
+	private final JTextArea plain = new JTextArea();
 
 	// ======================================================================
 	// コンストラクタ
@@ -78,7 +79,7 @@ public class TikaSample extends JFrame {
 
 		// ファイル名ラベル
 		fileName.setFont(fileName.getFont().deriveFont(18f));
-		fileName.setText("ファイルをドラッグしてください");
+		fileName.setText("ファイルをドロップしてください");
 		c.gridx = 0;		c.gridy = 0;
 		c.gridwidth = 1;	c.gridheight = 1;
 		c.weightx = 1.0;	c.weighty = 0.0;
@@ -87,13 +88,13 @@ public class TikaSample extends JFrame {
 		this.add(fileName, c);
 
 		// Tika 解析結果
+		plain.setEditable(false);
+		plain.setLineWrap(true);
 		c.gridx = 0;		c.gridy = 1;
 		c.gridwidth = 1;	c.gridheight = 1;
 		c.weightx = 1.0;	c.weighty = 1.0;
 		c.anchor = GridBagConstraints.WEST;
 		c.fill = GridBagConstraints.BOTH;
-		plain.setEditable(false);
-		plain.setDropMode(DropMode.USE_SELECTION);
 		this.add(new JScrollPane(plain), c);
 
 		// MIME-Type ラベル
@@ -131,12 +132,24 @@ public class TikaSample extends JFrame {
 				}
 				return true;
 			}
+
+			/** クリップボードへのテキスト転送処理を追加。 */
+			@Override
+			public void exportToClipboard(JComponent comp, Clipboard clip, int action) throws IllegalStateException {
+				if(comp instanceof JTextComponent){
+					JTextComponent t = (JTextComponent)comp;
+					String text = t.getSelectedText();
+					Transferable tf = new StringSelection(text);
+					clip.setContents(tf, null);
+				}
+				return;
+			}
 		};
 		fileName.setTransferHandler(h);
 		mimeType.setTransferHandler(h);
 		plain.setTransferHandler(h);
 
-		//
+		// 標準状態に設定
 		this.pack();
 
 		// ウィンドウ状態の復元

@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="tika sample" basedir=".." default="tika.zip">
+	<property name="dir.dist" value="dist"/>
 	<property name="lib.tika" value="tika-app-0.9.jar"/>
 
 	<target name="tika.zip">
-		<mkdir dir="dest"/>
-		<jar jarfile="dest/tikasample.jar">
+		<mkdir dir="${dir.dist}"/>
+		<mkdir dir="build/classes"/>
+		<javac srcdir="build/src" destdir="build/classes" classpath="lib/tika-app-0.9.jar" encoding="UTF-8"/>
+		<jar jarfile="${dir.dist}/tikasample.jar">
 			<fileset dir="build/classes" includes="**/*.class"/>
-			<filename />
 			<manifest>
 				<attribute name="Main-Class" value="org.koiroha.tika.TikaSample"/>
 				<attribute name="Class-Path" value="${lib.tika}"/>
 			</manifest>
 		</jar>
-		<zip destfile="dest/tikasample.zip">
-			<fileset dir="dest" includes="tikasample.jar"/>
+		<zip destfile="${dir.dist}/tikasample.zip">
+			<fileset dir="${dir.dist}" includes="tikasample.jar"/>
 			<fileset dir="lib"  includes="${lib.tika}"/>
 		</zip>
-		<delete file="dest/tikasample.jar"/>
+		<delete file="${dir.dist}/tikasample.jar"/>
 	</target>
 </project>
